@@ -18,9 +18,7 @@ flowtest: main.o simpleFlow.o
 	$(CXX) -fopenmp  -o $@ $+  $(LDFLAGS)
 
 clean:
-	-rm -f $(OBJS) Make.depend
-
-
+	-rm -f $(OBJS) flowtest Make.depend
 
 
 # for flymake syntax checking

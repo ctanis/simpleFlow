@@ -131,9 +131,6 @@ namespace sflow
     public:
         int loadStarCD(std::string basename);
 
-
-    private:
-        int maxNode;
         std::vector<node_coords> coords;
         std::vector<tet_nodes> tets;
         std::vector<int> tetTags;

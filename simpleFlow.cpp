@@ -20,10 +20,7 @@ int LocalGrid::loadStarCD(std::string basename)
     if (load_nodes(basename + ".vrt", coords) == 0)
         return 0;
 
-    if (maxNode < 0)
-        return 0;
-
-    maxNode = load_tets(basename + ".cel", tets, tetTags);
+    int maxNode = load_tets(basename + ".cel", tets, tetTags);
 
     if (maxNode < 0)
     {
@@ -36,10 +33,16 @@ int LocalGrid::loadStarCD(std::string basename)
         return 0;
     }
         
+    maxNode = load_boundaries(basename + ".bnd", bnds, bndTags);
 
-
-    if (load_boundaries(basename + ".bnd", bnds, bndTags) == 0)
+    if (maxNode < 0)
         return 0;
+
+    if (maxNode >= (int)coords.size())
+    {
+        ERROR("boundary refers to illegal node: " << maxNode);
+        return 0;
+    }
 
     return 0;
 }
@@ -80,25 +83,28 @@ static int load_nodes(std::string filename,
 	coords.push_back(tmp);
     }
 
-    if (in.eof())
-    {
-        LOG("success reading " << filename);
-    }
+    LOG("node count: " << coords.size());
 
     if (in.bad())
     {
         ERROR("input stream went bad -- aborting node read!");
+        in.close();
         return 0;
     }
 
-    if (in.fail())
+    if (in.eof())
+    {
+        LOG("success reading " << filename);
+    }
+    else if (in.fail())
     {
         ERROR("input stream failed -- cutting node read short!");
+        in.close();
         return 0;
     }
 
-    in.close();
 
+    in.close();
     return 1;
 }
 
@@ -177,24 +183,26 @@ static int load_tets(std::string filename,
 	count++;
     }
 
-    in.close();
+    if (in.bad())
+    {
+        ERROR("input stream went bad -- aborting tet read!");
+        in.close();
+        return 0;
+    }
+
     if (in.eof())
     {
         LOG("success reading " << filename);
     }
-
-    if (in.bad())
-    {
-        ERROR("input stream went bad -- aborting tet read!");
-        return 0;
-    }
-
-    if (in.fail())
+    else if (in.fail())
     {
         ERROR("input stream failed -- cutting tet read short!");
+        in.close();
         return 0;
     }
 
+ 
+    in.close();
     return maxnode;
 }
 
@@ -216,11 +224,13 @@ static int load_boundaries(std::string filename,
     if (! in.is_open() )
     {
         ERROR("error opening " << filename);
-        return 0;
+        return -1;
     }
 
     bnds.clear();
     tags.clear();
+
+    int maxnode=0;
 
     while (in.getline(linebuf, LINESIZE))
     {
@@ -235,30 +245,39 @@ static int load_boundaries(std::string filename,
 	ss>>dummy;
 	ss>>btype;
 
+        for (int i=0;i<3; i++)
+        {
+            if (face[i] > maxnode)
+                maxnode = face[i];
+        }
+
         bnds.push_back(face);
 	tags.push_back(btype);
 	
     }
 
-    in.close();
+    if (in.bad())
+    {
+        ERROR("input stream went bad -- aborting bnd read!");
+
+        in.close();
+        return -1;
+    }
 
     if (in.eof())
     {
         LOG("success reading " << filename);
     }
-
-    if (in.bad())
-    {
-        ERROR("input stream went bad -- aborting bnd read!");
-        return 0;
-    }
-
-    if (in.fail())
+    else if (in.fail())
     {
         ERROR("input stream failed -- cutting bnd read short!");
-        return 0;
+        
+        in.close();
+        return -1;
     }
 
-    return 1;
+
+    in.close();
+    return maxnode;
 }
 
