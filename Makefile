@@ -15,7 +15,7 @@ all: Make.depend flowtest
 	$(CXX) -c $(CXXFLAGS) -I$(ROOT)/include ${1} $<
 
 flowtest: main.o simpleFlow.o
-	$(CXX) -fopenmp  -o $@ $+  $(LDFLAGS)
+	$(CXX)  -o $@ $+  $(LDFLAGS)
 
 clean:
 	-rm -f $(OBJS) flowtest Make.depend
