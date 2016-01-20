@@ -1,8 +1,5 @@
--include make.$(MODE)
 MODE ?= gcc
-CXX ?= gcc
-CXXFLAGS ?= -fopenmp -O3
-LDFLAGS ?= -lgomp
+-include make.$(MODE)
 EXE ?= flowtest.$(MODE)
 
 SRC=main.cpp simpleFlow.cpp
@@ -11,9 +8,8 @@ OBJS=$(SRC:.cpp=.o)
 
 all: Make.depend $(EXE)
 
-
 %.o: %.cpp 
-	$(CXX) -c $(CXXFLAGS) -I$(ROOT)/include ${1} $<
+	$(CXX) -c $(CXXFLAGS) ${1} $<
 
 $(EXE): main.o simpleFlow.o
 	$(CXX)  -o $@ $+  $(LDFLAGS)
