@@ -1,0 +1,3 @@
+CXX=icc
+CXXFLAGS= -openmp -O3
+LDFLAGS= -openmp

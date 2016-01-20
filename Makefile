@@ -1,24 +1,25 @@
--include make.local
-
-CXX ?= g++
+-include make.$(MODE)
+MODE ?= gcc
+CXX ?= gcc
 CXXFLAGS ?= -fopenmp -O3
 LDFLAGS ?= -lgomp
+EXE ?= flowtest.$(MODE)
 
 SRC=main.cpp simpleFlow.cpp
 HDRS=simpleFlow.hpp
 OBJS=$(SRC:.cpp=.o)
 
-all: Make.depend flowtest
+all: Make.depend $(EXE)
 
 
 %.o: %.cpp 
 	$(CXX) -c $(CXXFLAGS) -I$(ROOT)/include ${1} $<
 
-flowtest: main.o simpleFlow.o
+$(EXE): main.o simpleFlow.o
 	$(CXX)  -o $@ $+  $(LDFLAGS)
 
 clean:
-	-rm -f $(OBJS) flowtest Make.depend
+	-rm -f $(OBJS) flowtest* Make.depend
 
 
 # for flymake syntax checking

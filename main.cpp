@@ -1,24 +1,11 @@
 #include "simpleFlow.hpp"
 #include <omp.h>
 
+sflow::LocalGrid grid;
+double total=0;
 
-int main(int argc, char *argv[])
+void process()
 {
-    sflow::LocalGrid grid;
-    std::cout << "running on " << omp_get_max_threads() << " threads" << std::endl;
-
-    
-    double start = omp_get_wtime();
-    grid.loadStarCD("trial");
-    double end = omp_get_wtime();
-    std::cout << "load time: " << (end-start) << std::endl;
-
-    double total=0;
-
-    
-
-    start = omp_get_wtime();
-
 #pragma omp parallel for reduction(+:total)
     for (unsigned int c=0; c<grid.tets.size(); c++)
     {
@@ -31,7 +18,25 @@ int main(int argc, char *argv[])
             }
         }
     }
+    
+}
 
+
+int main(int argc, char *argv[])
+{
+
+    std::cout << "running on " << omp_get_max_threads() << " threads" << std::endl;
+    
+    double start = omp_get_wtime();
+    grid.loadStarCD("trial");
+    double end = omp_get_wtime();
+    std::cout << "load time: " << (end-start) << std::endl;
+
+
+    
+
+    start = omp_get_wtime();
+    process();
     end = omp_get_wtime();
 
     std::cout << "meaningless total: " << total << std::endl;
