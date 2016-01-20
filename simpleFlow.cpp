@@ -281,3 +281,73 @@ static int load_boundaries(std::string filename,
     return maxnode;
 }
 
+
+void sflow::buildCSR(const LocalGrid& grid,
+                     std::vector<int>& ia,
+                     std::vector<int>& ja)
+{
+    std::vector<intset> hash(grid.coords.size());
+
+    for (unsigned int n=0; n<hash.size(); n++)
+    {
+        hash[n].insert(n);      // all values self-dependent
+    }
+
+    /* resolve tet dependencies */
+    for (unsigned int t=0; t<grid.tets.size(); t++)
+    {
+        const array<int,4>& tet = grid.tets[t];
+
+        for (int n1=0; n1<4; n1++)
+        {
+            for (int n2=0; n2<4; n2++)
+            {
+                if (n1 != n2)
+                {
+                    hash[tet[n1]].insert(tet[n2]);
+                }
+            }
+        }
+    }
+
+
+    // resolve bnd dependencies -- unnecessary assumes all boundaries are part
+    // of a tet
+
+    // for (int t=0; t<grid.bnds.size(); t++)
+    // {
+    //     const array<int,3>& tri = grid.bnds[t];
+
+    //     for (int n1=0; n1<3; n1++)
+    //     {
+    //         for (int n2=0; n2<3; n2++)
+    //         {
+    //             hash[tri[n1]].insert(tri[n2]);
+    //         }
+    //     }
+    // }
+
+
+    /* flatten hash */
+    ia.reserve(hash.size()+1);
+
+    int total=0;
+    for (unsigned int n=0; n<hash.size(); n++)
+    {
+        total += hash[n].size();
+    }
+    ja.reserve(total);
+
+    for (unsigned int n=0; n<hash.size(); n++)
+    {
+        ia.push_back(ja.size());
+
+        for (unsigned int v=0; v<hash[n].size(); v++)
+        {
+            ja.push_back(hash[n][v]);
+        }
+    }
+    ia.push_back(ja.size());
+
+}
+

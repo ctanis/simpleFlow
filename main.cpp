@@ -32,8 +32,12 @@ int main(int argc, char *argv[])
     double end = omp_get_wtime();
     std::cout << "load time: " << (end-start) << std::endl;
 
+    std::vector<int> ia;
+    std::vector<int> ja;
 
+    sflow::buildCSR(grid, ia, ja);
     
+    std::cout << "csr: " << ia.size() << " ; " << ja.size() << std::endl;
 
     start = omp_get_wtime();
     process();
