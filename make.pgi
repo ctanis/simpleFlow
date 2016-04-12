@@ -1,0 +1,4 @@
+CXX = pgc++
+CXXFLAGS = -acc -ta=tesla:kepler -Minfo=accel
+LDFLAGS= -acc
+

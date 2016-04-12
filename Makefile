@@ -15,7 +15,10 @@ $(EXE): main.o simpleFlow.o
 	$(CXX)  -o $@ $+  $(LDFLAGS)
 
 clean:
-	-rm -f $(OBJS) flowtest* Make.depend
+	-rm -f $(OBJS) Make.depend
+
+cleanall: clean
+	-rm -f flowtest* 
 
 
 # for flymake syntax checking

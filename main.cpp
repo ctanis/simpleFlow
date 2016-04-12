@@ -6,7 +6,9 @@ double total=0;
 
 void process()
 {
-#pragma omp parallel for reduction(+:total)
+//#pragma omp parallel for reduction(+:total)
+#pragma acc enter data copyin(grid.coords)
+#pragma acc parallel loop    
     for (unsigned int c=0; c<grid.tets.size(); c++)
     {
         for (int i=0; i<4; i++)
